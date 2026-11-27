@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huffman Compressor</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <h1>Huffman Compressor</h1>
+      <p>Lossless text compression with a from-scratch Huffman Coding engine</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="tabs" role="tablist" aria-label="Mode">
+      <button role="tab" class="tab active" data-mode="compress" aria-selected="true">Compress</button>
+      <button role="tab" class="tab" data-mode="decompress" aria-selected="false">Decompress</button>
+    </nav>
+
+    <section id="panel-compress" class="card">
+      <h2>Compress a text file</h2>
+      <label id="drop-c" class="dropzone" for="file-c">
+        <input id="file-c" type="file" accept=".txt,text/plain,.md,.csv,.json,.log">
+        <strong>Drop a .txt file here</strong> or click to browse
+      </label>
+      <div id="chip-c" class="chip" hidden>
+        <span id="chip-c-name"></span>
+        <button id="chip-c-clear" type="button" class="link">Remove</button>
+      </div>
+      <textarea id="text-input" rows="7" placeholder="…or paste / type text here"></textarea>
+      <div class="actions">
+        <button id="btn-compress" class="primary" type="button">Compress</button>
+        <button id="btn-sample" class="secondary" type="button">Load sample text</button>
+        <span id="status-c" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <section id="panel-decompress" class="card" hidden>
+      <h2>Restore a .huff file</h2>
+      <label id="drop-d" class="dropzone" for="file-d">
+        <input id="file-d" type="file" accept=".huff,application/octet-stream">
+        <strong>Drop a .huff file here</strong> or click to browse
+      </label>
+      <div id="chip-d" class="chip" hidden>
+        <span id="chip-d-name"></span>
+        <button id="chip-d-clear" type="button" class="link">Remove</button>
+      </div>
+      <div class="actions">
+        <button id="btn-decompress" class="primary" type="button">Decompress</button>
+        <span id="status-d" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <div id="error" class="error" role="alert" hidden></div>
+
+    <section id="results" hidden>
+      <div class="banner">
+        <div>
+          <h2 id="result-title"></h2>
+          <span id="verified" class="badge"></span>
+        </div>
+        <button id="btn-download" class="primary" type="button"></button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="k">Original size</span><span class="v" id="s-original"></span></div>
+        <div class="stat"><span class="k">Compressed size</span><span class="v" id="s-compressed"></span></div>
+        <div class="stat"><span class="k">Compression ratio</span><span class="v" id="s-ratio"></span></div>
+        <div class="stat"><span class="k">Space saved</span><span class="v" id="s-saved"></span></div>
+        <div class="stat"><span class="k">Encode time</span><span class="v" id="s-encode"></span></div>
+        <div class="stat"><span class="k">Decode time</span><span class="v" id="s-decode"></span></div>
+      </div>
+
+      <div class="card bars">
+        <div class="bar-row"><span>Original</span><div class="track"><div id="bar-o" class="fill orig"></div></div><span id="bar-o-t"></span></div>
+        <div class="bar-row"><span>Compressed</span><div class="track"><div id="bar-c" class="fill comp"></div></div><span id="bar-c-t"></span></div>
+      </div>
+
+      <div class="card">
+        <nav class="subtabs" role="tablist">
+          <button class="subtab active" data-view="codes">Frequencies &amp; codes</button>
+          <button class="subtab" data-view="tree">Huffman tree</button>
+          <button class="subtab" data-view="details">Details</button>
+          <button class="subtab" data-view="text" id="subtab-text" hidden>Restored text</button>
+        </nav>
+
+        <div id="view-codes" class="view">
+          <input id="filter" type="search" placeholder="Filter by symbol, hex or code…" aria-label="Filter table">
+          <div class="scroll">
+            <table id="code-table">
+              <thead><tr><th>Symbol</th><th>Byte</th><th class="num">Frequency</th><th class="num">Share</th><th class="num">Bits</th><th>Huffman code</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="note">Symbols are bytes. Bytes shown as <code>0x80</code>–<code>0xFF</code> are parts of multi-byte UTF-8 characters.</p>
+        </div>
+
+        <div id="view-tree" class="view" hidden>
+          <div class="tree-tools">
+            <button class="secondary" id="zoom-out" type="button" aria-label="Zoom out">−</button>
+            <button class="secondary" id="zoom-in" type="button" aria-label="Zoom in">+</button>
+            <button class="secondary" id="zoom-fit" type="button">Fit</button>
+            <span class="note">Left edge = 0, right edge = 1. Circles show combined weight; boxes are symbols with their frequency.</span>
+          </div>
+          <div id="tree-box" class="tree-box"></div>
+        </div>
+
+        <div id="view-details" class="view" hidden>
+          <table class="kv"><tbody id="details-body"></tbody></table>
+        </div>
+
+        <div id="view-text" class="view" hidden>
+          <pre id="text-preview"></pre>
+          <p id="text-note" class="note"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">Huffman Coding · standard-library Python · symbols are bytes, so every file round-trips exactly</footer>
+  <script src="/app.js"></script>
+</body>
+</html>
